@@ -2,12 +2,14 @@
 import type { HeroProps } from "@types";
 type Props = HeroProps;
 
-const { name, specialty, summary, email } = Astro.props;
+// We are bringing back 'email' and adding 'whatsapp' for the specific links
+const { name, specialty, summary, email, whatsapp } = Astro.props;
 ---
 
-<section class="py-24 md:py-32" id="#hero">
+{/* Added the "fade-up" class right here */}
+<section class="fade-up py-24 md:py-32" id="hero">
   <h1
-    class="mb-1.5 font-serif text-7xl font-bold tracking-tightest text-white sm:text-8xl md:mb-0 md:text-9xl"
+    class="mb-5 font-serif text-7xl font-bold tracking-tightest text-white sm:text-8xl md:mb-0 md:text-9xl"
   >
     {name}
   </h1>
@@ -16,12 +18,89 @@ const { name, specialty, summary, email } = Astro.props;
   >
     {specialty}
   </p>
-  <p class="mb-16 text-base font-normal text-neutral md:text-lg">
+  <p class="mb-16 text-xl font-normal text-neutral md:text-2xl">
     {summary}
   </p>
 
-  <a
-    class="inline-block rounded-full bg-primary px-8 py-5 text-sm leading-5 font-medium text-[#fff]"
-    href={`mailto:${email}`}>Get in Touch</a
-  >
+  {/* Container to stack the main button and the hidden circular buttons */}
+  <div class="flex flex-col items-start gap-4">
+
+    {/* 1. The Main Toggle Button */}
+    <button
+      id="contact-toggle-btn"
+      class="inline-block rounded-full bg-primary px-8 py-5 text-xl leading-5 font-medium text-[#fff] transition-transform hover:scale-105 active:scale-95"
+    >
+      كلمني
+    </button>
+
+    {/* 2. The Hidden Circular Buttons (Email & WhatsApp) */}
+    {/* These start invisible and shifted up slightly for a nice animation effect */}
+    <div
+      id="contact-options"
+      class="invisible flex -translate-y-2 gap-4 opacity-0 transition-all duration-300"
+    >
+      {/* WhatsApp Button */}
+      <a
+        href={whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-neutral/10 text-white transition-colors hover:bg-primary"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+      </a>
+
+      {/* Email Button */}
+      <a
+        href={`mailto:${email}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Email"
+        class="flex h-14 w-14 items-center justify-center rounded-full bg-neutral/10 text-white transition-colors hover:bg-primary"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
 </section>
+
+<script>
+  // Simple script to toggle the visibility and animation classes
+  const btn = document.getElementById("contact-toggle-btn");
+  const options = document.getElementById("contact-options");
+
+  btn?.addEventListener("click", () => {
+    if (options?.classList.contains("opacity-0")) {
+      // Reveal
+      options.classList.remove("opacity-0", "invisible", "-translate-y-2");
+      options.classList.add("opacity-100", "visible", "translate-y-0");
+    } else {
+      // Hide
+      options?.classList.add("opacity-0", "invisible", "-translate-y-2");
+      options?.classList.remove("opacity-100", "visible", "translate-y-0");
+    }
+  });
+</script>
+
+<style>
+  .fade-up {
+    opacity: 0;
+    /* Keeps the subtle upward movement */
+    transform: translateY(3rem);
+
+    /* Matches the author's exact 600ms timing, 'ease' curve, and 'both' fill mode */
+    animation: fadeUpAnimation 600ms ease both;
+  }
+
+  @keyframes fadeUpAnimation {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

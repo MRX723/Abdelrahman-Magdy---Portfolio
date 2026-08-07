@@ -1,5 +1,4 @@
 ---
-import Menu from "@icons/Menu.astro";
 import { Image } from "astro:assets";
 import type { HeaderProps } from "@types";
 
@@ -8,105 +7,131 @@ type Props = HeaderProps;
 const { siteLogo, navLinks } = Astro.props;
 ---
 
-<header
-  class="sticky top-0 z-50 mx-auto flex max-w-5xl animate-slide-in justify-between bg-black px-5 py-6"
->
-  <a href="/" aria-label="Home link">
-    <Image
-      class="rounded-full"
-      src={siteLogo}
-      width="45"
-      height="45"
-      alt="website logo"
-      priority
-    />
-  </a>
+<header class="sticky top-0 z-50 w-full animate-slide-in bg-black">
+  <div class="relative mx-auto flex w-full max-w-5xl justify-between px-5 py-6">
+    <a href="/" aria-label="Home link">
+      <Image
+        class="rounded-full text-transparent"
+        src={siteLogo}
+        width="45"
+        height="45"
+        alt="website logo"
+        priority
+      />
+    </a>
 
-  <button
-    type="button"
-    id="menu-button"
-    class="px-1.5 text-neutral sm:hidden"
-    aria-expanded="false"
-    aria-controls="main-menu"
-  >
-    <Menu />
-  </button>
+    {/* The Animated Hamburger Button */}
+    <button
+      type="button"
+      id="menu-button"
+      class="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-[6px] text-neutral sm:hidden"
+      aria-expanded="false"
+      aria-controls="main-menu"
+      aria-label="Toggle menu"
+    >
+      <span class="line-1 block h-[2px] w-6 bg-current transition-all duration-300"></span>
+      <span class="line-2 block h-[2px] w-6 bg-current transition-all duration-300"></span>
+      <span class="line-3 block h-[2px] w-6 bg-current transition-all duration-300"></span>
+    </button>
 
-  <nav
-    class="absolute top-20 right-5 hidden rounded-xl border border-neutral/40 bg-black px-4 py-5 text-neutral sm:static sm:block sm:border-0 sm:bg-transparent sm:p-0"
-    id="main-menu"
-  >
-    <ul class="gap-2 sm:flex">
-      {
-        navLinks.map((link) => (
-          <li class="relative">
-            <a
-              class={`nav-item relative block p-2 text-sm font-medium transition-all duration-500 after:absolute after:bottom-0 after:left-2/4 after:h-2 after:w-1 after:-translate-x-2/4 after:text-primary after:opacity-0 after:content-['•'] hover:text-white`}
-              href={link.href}
-            >
-              {link.text}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
+    {/* The Menu */}
+    <nav
+      class="absolute top-2 left-2 z-40 min-w-[200px] border border-neutral/20 bg-[#ffffff] p-5 pt-10 shadow-lg text-neutral opacity-0 invisible pointer-events-none transition-all duration-300 sm:static sm:block sm:min-w-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:text-neutral sm:opacity-100 sm:visible sm:pointer-events-auto"
+      id="main-menu"
+    >
+      <ul class="gap-2 sm:flex">
+        {
+          navLinks.map((link) => (
+            <li class="relative">
+              <a
+                class={`nav-item relative block p-2 text-xl font-medium transition-all duration-500 after:absolute after:bottom-0 after:left-2/4 after:h-2 after:w-1 after:-translate-x-2/4 after:text-primary after:opacity-0 after:content-['•'] hover:text-primary sm:hover:text-white`}
+                href={link.href}
+              >
+                {link.text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
 </header>
 
 <script>
-  // Toggle mobile menu
   const button = document.querySelector("#menu-button");
   const menu = document.querySelector("#main-menu");
   const navItems = document.querySelectorAll("#main-menu > ul > li > a");
+  const sections = document.querySelectorAll("section");
 
   const toggleMenu = () => {
-    menu?.classList.toggle("hidden");
-    const isHidden = menu?.classList.contains("hidden");
+    menu?.classList.toggle("opacity-0");
+    menu?.classList.toggle("invisible");
+    menu?.classList.toggle("pointer-events-none");
+
+    menu?.classList.toggle("opacity-100");
+    menu?.classList.toggle("visible");
+    menu?.classList.toggle("pointer-events-auto");
+
+    button?.classList.toggle("is-active");
+
+    const isHidden = menu?.classList.contains("opacity-0");
     button?.setAttribute("aria-expanded", `${!isHidden}`);
   };
 
   button?.addEventListener("click", toggleMenu);
+
   navItems.forEach((item) => {
-    item?.addEventListener("click", toggleMenu);
+    item?.addEventListener("click", () => {
+      if (menu?.classList.contains("opacity-100") && window.innerWidth < 640) {
+        toggleMenu();
+      }
+    });
   });
 
-  // Update navigation based on scroll position with Intersection Observer
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          navItems.forEach((item) => {
-            if (item.getAttribute("href") === `#${entry.target.id}`) {
-              item.classList.add("text-white", "md:after:opacity-100");
-            } else {
-              item.classList.remove("text-white", "md:after:opacity-100");
-            }
-          });
-        }
-      });
-    },
-    { threshold: 0.5 },
-  );
+  const updateNavigation = () => {
+    let currentSectionId = "";
+    const triggerLine = window.innerHeight * 0.75;
 
-  document.querySelectorAll("section").forEach((section) => {
-    observer.observe(section);
-  });
+    sections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= triggerLine) {
+        currentSectionId = section.getAttribute("id") || "";
+      }
+    });
 
-  // Cleanup observer
-  document.onvisibilitychange = () => {
-    if (document.visibilityState === "hidden") {
-      observer.disconnect();
-    } else {
-      document.querySelectorAll("section").forEach((section) => {
-        observer.observe(section);
-      });
+    if (window.scrollY < 150) {
+      currentSectionId = "";
     }
+
+    navItems.forEach((item) => {
+      item.classList.remove("text-primary", "sm:text-white", "md:after:opacity-100");
+
+      if (currentSectionId && item.getAttribute("href")?.endsWith(`#${currentSectionId}`)) {
+        item.classList.add("text-primary", "sm:text-white", "md:after:opacity-100");
+      }
+    });
   };
+
+  window.addEventListener("scroll", updateNavigation);
+  window.addEventListener("load", updateNavigation);
 </script>
 
 <style>
   header {
     animation-timeline: scroll();
     animation-range: 0 650px;
+  }
+
+  /* Hamburger to X Animation CSS */
+  #menu-button.is-active .line-1 {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  #menu-button.is-active .line-2 {
+    opacity: 0;
+  }
+
+  #menu-button.is-active .line-3 {
+    transform: translateY(-8px) rotate(-45deg);
   }
 </style>

@@ -10,7 +10,6 @@ export interface SiteConfig extends HeaderProps {
 
 export interface SiteContent {
   hero: HeroProps;
-  experience: ExperienceProps[];
   projects: ProjectProps[];
   about: AboutProps;
 }
@@ -20,6 +19,7 @@ export interface HeroProps {
   specialty: string;
   summary: string;
   email: string;
+  whatsapp: string;
 }
 
 export interface ExperienceProps {

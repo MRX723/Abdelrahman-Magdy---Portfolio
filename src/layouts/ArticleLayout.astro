@@ -1,0 +1,66 @@
+---
+import { SITE_CONTENT } from "@config";
+import Hero from "@components/Hero.astro";
+import Layout from "@layouts/Layout.astro";
+import About from "@components/About.astro";
+
+import "../styles/global.css";
+
+const { frontmatter = { title: 'Untitled Article', image: '' } } = Astro.props;
+---
+
+{/* Force Layout to stretch to 7xl */}
+<Layout title={frontmatter.title} customWidth="max-w-7xl">
+
+  <main class="w-full pt-6 pb-16">
+
+    {/* 1. IMAGE: Takes up the full 7xl space and now has a soft shadow */}
+     {frontmatter.image && (
+      <img
+        src={frontmatter.image}
+        loading="eager"
+        fetchpriority="high"
+        alt=""
+        /* aspect-square makes it 1:1 on mobile, md:h-[500px] locks it on desktop */
+        class="w-full aspect-square md:aspect-auto md:h-[500px] rounded-2xl object-cover shadow-lg"
+      />
+    )}
+
+    {/* 2. TITLE & TEXT CONTAINER: Restricted strictly to 5xl and centered */}
+    <div class="mx-auto mt-8 max-w-5xl">
+
+      {/* Added border-t-2 to make the line thicker */}
+      <hr class="mb-8 border-t-2 border-neutral/20" />
+
+      {/* Title: 4xl on mobile, 6xl on desktop */}
+      <h1 class="mb-6 text-right text-4xl font-bold text-white md:text-6xl" dir="rtl">
+        {frontmatter.title}
+      </h1>
+
+     <article dir="rtl" class="text-right text-xl leading-loose text-gray-800 md:text-2xl
+        [&_a]:text-blue-500 hover:[&_a]:text-blue-400 [&_a]:underline
+
+        [&_h1]:mb-8 [&_h1]:text-2xl md:[&_h1]:text-3xl [&_h1]:font-bold
+        [&_h2]:mb-4 [&_h2]:mt-10 [&_h2]:text-2xl [&_h2]:text-primary md:[&_h2]:text-3xl [&_h2]:font-bold
+
+        {/* Solo Image Fix */}
+        [&_p:has(img)]:grid [&_p:has(img)]:w-full [&_p:has(img)]:place-items-center
+        [&_img]:block [&_img]:my-10 [&_img]:w-2xl [&_img]:max-w-full [&_img]:rounded-2xl [&_img]:object-cover [&_img]:shadow-xl
+
+        {/* Figure Fix */}
+        [&_figure]:grid [&_figure]:w-full [&_figure]:place-items-center [&_figure]:mt-11 [&_figure]:mb-11
+        [&_figure_img]:my-0
+        [&_figcaption]:mt-4 [&_figcaption]:text-center [&_figcaption]:text-lg md:[&_figcaption]:text-xl [&_figcaption]:text-neutral
+
+        {/* CHANGE THIS LINE RIGHT HERE (Changed mb-6 to mb-12) */}
+        [&_p]:mb-12
+
+        [&_ul]:mb-6 [&_ul]:list-inside [&_ul]:list-disc">
+
+        <slot />
+
+      </article>
+    </div>
+
+  </main>
+</Layout>

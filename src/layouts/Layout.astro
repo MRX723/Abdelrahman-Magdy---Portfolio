@@ -4,8 +4,16 @@ import { Font } from "astro:assets";
 import { SITE_CONFIG } from "@config";
 import Footer from "@components/Footer.astro";
 
+interface Props {
+  title?: string;
+  customWidth?: string;
+}
+
+// Default is 5xl to protect your homepage!
+const { customWidth = "max-w-5xl", title: pageTitle } = Astro.props;
+
 const {
-  title,
+  title: siteTitle,
   description,
   siteLogo,
   navLinks,
@@ -16,11 +24,12 @@ const {
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
 } = SITE_CONFIG;
 
+const finalTitle = pageTitle || siteTitle;
 const ogImgUrl = canonicalURL + socialImage;
 ---
 
 <!doctype html>
-<html lang={lang} class="scroll-pt-16 scroll-smooth">
+<html lang="ar" dir="rtl" class="scroll-pt-16 scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -28,27 +37,31 @@ const ogImgUrl = canonicalURL + socialImage;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{finalTitle}</title>
 
     <Font cssVariable="--font-gabarito" preload />
     <Font cssVariable="--font-be-vietnam-pro" preload />
 
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={finalTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImgUrl} />
 
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
+    <meta property="twitter:title" content={finalTitle} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={ogImgUrl} />
+    <link rel="preload" href="/abdelrahman-small.jpg" as="image" />
   </head>
   <body class="bg-black font-sans">
     <Header siteLogo={siteLogo} navLinks={navLinks} />
-    <main class="mx-auto max-w-3xl px-5">
+
+    {/* This receives 5xl on home, 7xl on articles */}
+    <main class={`mx-auto w-full px-5 ${customWidth}`}>
       <slot />
     </main>
+
     <Footer author={author} socialLinks={socialLinks} />
   </body>
 </html>
