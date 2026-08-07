@@ -15,7 +15,6 @@ export const SITE_CONFIG: SiteConfig = {
     { text: "WhatsApp", href: "https://wa.me/201555911186" },
     { text: "Email", href: "mailto:abdumgdi570@gmail.com" },
   ],
-  socialImage: "/zen-og.png",
   canonicalURL: "https://astro-zen.vercel.app",
 };
 
